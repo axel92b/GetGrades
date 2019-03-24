@@ -7,11 +7,12 @@ import winsound
 import datetime
 
 class GetGrades:
-    def __init__(self, master , login, passw, sem):
+    def __init__(self, master , login, passw, sem, courseNums):
         self.master = master
         self.sem = sem
         self.login = login
         self.passw = passw
+        self.courseNums = courseNums
         self.count = 0
         self.threadMessage = 1
         self.courseLabel = Label(self.master, text= "Course")
@@ -21,9 +22,8 @@ class GetGrades:
         self.b = []
         self.c = []
         self.chosenCourse = StringVar(self.master)
-        courseNum = GetGradesClass.getCourses(self.login,self.passw, self.sem)
-        self.chosenCourse.set(courseNum[0])
-        self.courseMenu = OptionMenu(self.master, self.chosenCourse, *courseNum)
+        self.chosenCourse.set(courseNums[0])
+        self.courseMenu = OptionMenu(self.master, self.chosenCourse, *courseNums)
         self.courseMenu.config(width = 13)
         self.minutes = Entry(self.master, width = 19,justify = RIGHT)
         self.lArr1 = []
@@ -174,7 +174,12 @@ class LoginWin:
 
     def tryToLogin(self, event = ""):
         self.newGui = Tk()
-        monGUI = GetGrades(self.newGui,self.login.get(),self.passw.get(),self.getDateFormat(self.yearVal.get(),self.chosenSem.get()))
+        self.sem = self.getDateFormat(self.yearVal.get(),self.chosenSem.get())
+        courseNums = GetGradesClass.getCourses(self.login.get(),self.passw.get(), self.sem)
+        if len(courseNums) == 0:
+            messagebox.showerror("Error", "Invalid login/password or you don't have any courses in semester: "+str(self.chosenSem.get())+" "+str(self.yearVal.get()))
+            return
+        monGUI = GetGrades(self.newGui,self.login.get(),self.passw.get(),self.sem, courseNums)
         self.master.destroy()
         self.newGui.bind("<Return>",monGUI.updateFunc)
         self.newGui.protocol("WM_DELETE_WINDOW", lambda: monGUI.killThread(1))
@@ -192,7 +197,7 @@ def main():
         return
 
     top = Tk()
-    other = GetGrades(top,logs[0],logs[1],LoginWin.getDateFormat(None,'2018','Winter'))
+    other = GetGrades(top,logs[0],logs[1],LoginWin.getDateFormat(None,'2017','Winter'),GetGradesClass.getCourses(logs[0],logs[1], '201701'))
     top.bind("<Return>",other.updateFunc)
     top.protocol("WM_DELETE_WINDOW", lambda: other.killThread(1))
     top.mainloop()
