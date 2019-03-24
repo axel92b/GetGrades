@@ -4,8 +4,6 @@ import time
 
 #minutes = 0.1
 
-# Fill in your details here to be posted to the login form.
-
 def getSubStr(p1, p2, src):
     if len(src) == 0:
         return "",""
@@ -25,6 +23,16 @@ def fillList(src, p1, p2):
         tempList.append(subStr)
     return tempList
 
+def fillCourseList(src, p1, p2):
+    tempList = []
+    for i in range(len(src)):
+        subStr, src = getSubStr(p1,p2,src)
+        if src == "":
+            continue
+        if subStr.isnumeric():
+            tempList.append(subStr)
+    return tempList
+
 def getInfo(p):
     arrNames = fillList(p,"<em>","</em>")
     newStr = (getSubStr("Your grade", "Average", p))[0]
@@ -34,11 +42,11 @@ def getInfo(p):
     return arrNames,arrGrades, arrAvg
 
 # Use 'with' to ensure the session context is closed after use.
-def getData(log, passw, sem):
+def getData(log, passw, sem,course):
     endOfTable = "Average of all students in this exercise."
     payload = {
         'Login': '1',
-        'Course': '234218',
+        'Course': course,
         'Page': 'grades.html',
         'SEM': sem,
         'FromLock': '1',
@@ -62,14 +70,43 @@ def getData(log, passw, sem):
         secondIndex = tempStr.find(endOfTable)
         p = tempStr[firstIndex:secondIndex]
         tempStr = tempStr[secondIndex+len(endOfTable):]
-        kek = getInfo(p)
-        arrNames = arrNames + kek[0]
-        arrGrades = arrGrades + kek[1]
-        arrAvg = arrAvg + kek[2]
+        temp = getInfo(p)
+        arrNames = arrNames + temp[0]
+        arrGrades = arrGrades + temp[1]
+        arrAvg = arrAvg + temp[2]
         if curLen == len(arrNames):
             break
         curLen = len(arrNames)
     return arrNames, arrGrades, arrAvg
+
+
+def getCourses(log, passw, sem):
+    beginingOfTable = "semester."
+    endOfTable = "Add the following"
+    payload = {
+        'Login': '1',
+        'SEM': sem,
+        'FromLock': '1',
+        'ID': log,
+        'Password': passw,
+        'submit': 'proceed'
+    }
+    p = ""
+    arrNames = []
+    with requests.Session() as s:
+        p = s.post('https://grades.cs.technion.ac.il/grades.cgi', data=payload)
+        tempStr = str(p.text)
+        if "<span class=\"highlighttab\">Course List</span></td>" not in tempStr:
+            p = s.post('https://grades.cs.technion.ac.il/grades.cgi', data=payload)
+        tempStr = str(p.text)
+    firstIndex = tempStr.find(beginingOfTable)
+    secondIndex = tempStr.find(endOfTable)
+    p = tempStr[firstIndex:secondIndex]
+    arrNames = fillCourseList(tempStr,"<span class=\"black-text\">","</span>")
+    return arrNames
+
+# if __name__== "__main__":
+#   main()
 
 #debug
 # def printData2():
@@ -122,5 +159,3 @@ def getData(log, passw, sem):
 #         winsound.PlaySound("SystemHand", winsound.SND_ALIAS)
 #         winsound.PlaySound("SystemHand", winsound.SND_ALIAS)
 
-# if __name__== "__main__":
-#   main()

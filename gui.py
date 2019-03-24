@@ -7,12 +7,9 @@ import winsound
 import datetime
 
 #TODO validate minutes input
-#TODO course numbers parse
-#TODO semester input from user
 #TODO add labels
-#TODO file input for pass for debug
 #TODO clean code
-
+#TODO try to fix errors on exit
 
 class Calculator:
 
@@ -69,25 +66,23 @@ class Calculator:
         self.total_label_text.set(self.total)
         self.entry.delete(0, END)
 
-
-
 class GetGrades:
     def __init__(self, master , login, passw, sem):
-        
         self.master = master
         self.sem = sem
         self.login = login
         self.passw = passw
         self.count = 0
+        self.threadMessage = 1
         self.textCouter = ""
-        self.textLabelVal = StringVar(self.master)
         self.courseLabel = Label(self.master, text= "Course")
-        self.textLabel = Label(self.master, textvariable = self.textLabelVal)
-        master.title("Get Grades Alpha - Hi " + self.login)
-        self.a,self.b,self.c = GetGradesClass.getData(self.login, self.passw, self.sem)
+        master.title("Get Grades(Alpha) - Hi " + self.login)
+        self.a = []
+        self.b = []
+        self.c = []
         self.chosenCourse = StringVar(self.master)
         #change to parser of course numbers
-        courseNum = ['234218','234262']
+        courseNum = GetGradesClass.getCourses(self.login,self.passw, self.sem)
         self.chosenCourse.set(courseNum[0])
         self.courseMenu = OptionMenu(self.master, self.chosenCourse, *courseNum)
         self.courseMenu.config(width = 13)
@@ -95,22 +90,15 @@ class GetGrades:
         self.lArr1 = []
         self.lArr2 = []
         self.lArr3 = []
-        self.fillLabels(self.a,self.lArr1)
-        self.fillLabels(self.b,self.lArr2)
-        self.fillLabels(self.c,self.lArr3)
 
         # BUTTONS
         self.updButt = Button(self.master, text = "Monitor!", command = self.updateFunc)
 
         # LAYOUT
         self.courseLabel.grid(column = 0, row = 0)
-        self.updButt.grid(column = 1, row = 3, columnspan = 2)
-        self.courseMenu.grid(column = 1, row = 0, columnspan = 2)
-        self.minutes.grid(column = 1, row = 2, columnspan = 2)
-        self.textLabel.grid(column = 3, row = 3, columnspan = 4)
-        self.fillGridOfLabels(self.a,self.lArr1,0)
-        self.fillGridOfLabels(self.b,self.lArr2,1)
-        self.fillGridOfLabels(self.c,self.lArr3,2)
+        self.courseMenu.grid(column = 1, row = 0)
+        self.minutes.grid(column = 1, row = 1)
+        self.updButt.grid(column = 1, row = 2)
 
     
 
@@ -123,18 +111,31 @@ class GetGrades:
 
     def fillLabels(self, arr, targArr, compArr = None):
         for i in range(len(arr)):
-            if compArr != None and i in compArr:
+            if compArr != None and i in compArr and self.firstTime == 0:
                 targArr.append(Label(self.master, text=arr[i], fg="green"))
                 continue
             targArr.append(Label(self.master, text=arr[i]))
 
     def fillGridOfLabels(self,arr,targArr,r):
-        for i in range(3,len(arr)+3):
-            targArr[i-3].grid(column = i, row = r)
+        for i in range(2,len(arr)+2):
+            targArr[i-2].grid(column = i, row = r)
 
     def updateFunc(self):
+        self.killThread()
+        self.threadMessage = 1
         self.t1 = threading.Thread(target=self.monFunc, args=[])
         self.t1.start()
+
+    def killThread(self):
+        try:
+            if self.t1.isAlive():
+                self.threadMessage = 0
+                # self.t1.join(10)
+                self.t1.join()
+        except NameError:
+            self.t1 = ""
+        except AttributeError:
+            self.t1 = ""
 
     def destroyLabel(self, arr):
         for i in range(len(arr)):
@@ -152,19 +153,19 @@ class GetGrades:
 
     def monFunc(self):
         #messagebox.showinfo("kek", "lol")
-        #time.sleep(20)
         #try catch block or validation block
         kek = self.getGradesDebug()
         self.minutesVal = float(self.minutes.get())
+        self.saveCourseNum = self.chosenCourse.get()
+        self.firstTime = 1
         while True:
             self.lArr4 = []
             self.lArr5 = []
             self.lArr6 = []
-            time.sleep(60*self.minutesVal)
             #DEBUG
-            #self.d,self.e,self.f = GetGradesClass.getData(self.login,self.passw, self.sem)
-            self.d,self.e,self.f = next(kek)
-            if self.d != self.a or self.e != self.b or self.f != self.c:
+            self.d,self.e,self.f = GetGradesClass.getData(self.login,self.passw, self.sem, self.saveCourseNum)
+            #self.d,self.e,self.f = next(kek)
+            if self.d != self.a or self.e != self.b or self.f != self.c or self.firstTime == 1:
                 self.count = 0
                 tempCompArr = self.getUpdatedIndexes(self.a, self.d)
                 self.fillLabels(self.d,self.lArr4,tempCompArr)
@@ -183,23 +184,25 @@ class GetGrades:
                 self.lArr1 = self.lArr4.copy()
                 self.lArr2 = self.lArr5.copy()
                 self.lArr3 = self.lArr6.copy()
-                winsound.PlaySound('SystemQuestion',winsound.SND_ALIAS)
-                winsound.PlaySound('SystemQuestion',winsound.SND_ALIAS)
-            #check for changes in arr
-            # update layout
-            # copy arrays   
+                if self.firstTime == 0:
+                    winsound.PlaySound('SystemQuestion',winsound.SND_ALIAS)
+                    winsound.PlaySound('SystemQuestion',winsound.SND_ALIAS)
+                self.firstTime = 0
             self.count += 1 
+            if self.threadMessage == 0:
+                break
             if self.count == 1:
-                self.textLabelVal.set("Checked 1 time")
+                self.master.title("Get Grades(Alpha) - Hi " + self.login + " - Checked 1 time")
             else:
-                self.textLabelVal.set("Checked " + str(self.count) + " times")
+                self.master.title("Get Grades(Alpha) - Hi " + self.login + " - Checked " + str(self.count) + " times")
+            time.sleep(60*self.minutesVal)
             
 
 class LoginWin:
     def __init__(self, master):
         self.master = master
         self.tempDate = datetime.datetime.now()
-        master.title("Get Grades Alpha")
+        master.title("Get Grades(Alpha)")
         self.l1 = Label(master, text="Login")
         self.l2 = Label(master, text="Password")
         self.login = Entry(master, bd = 5)
@@ -233,7 +236,6 @@ class LoginWin:
 
     def tryToLogin(self, event):
         self.newGui = Tk()
-        #TODO replace with parser
         newkek = GetGrades(self.newGui,self.login.get(),self.passw.get(),self.getDateFormat(self.yearVal.get(),self.chosenSem.get()))
         self.master.destroy()
         self.newGui.mainloop()
@@ -242,7 +244,7 @@ class LoginWin:
 
 #REMOVE WHEN FINISHED 
 try:
-    logs = open("logs6", "r").read().split('\n')
+    logs = open("logs", "r").read().split('\n')
 except FileNotFoundError:
     top = Tk()
     m_gui = LoginWin(top)
