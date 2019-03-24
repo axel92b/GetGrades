@@ -6,10 +6,7 @@ import threading
 import winsound
 import datetime
 
-#TODO validate minutes input
-#TODO add labels
 #TODO clean code
-
 
 class GetGrades:
     def __init__(self, master , login, passw, sem):
@@ -65,6 +62,11 @@ class GetGrades:
             targArr[i-2].grid(column = i, row = r)
 
     def updateFunc(self, event = ""):
+        try:
+            self.minutesVal = float(self.minutes.get())
+        except ValueError:
+            messagebox.showerror("Error", "Please enter valid duration")
+            return
         self.killThread()
         self.threadMessage = 1
         self.t1 = threading.Thread(target=self.monFunc, args=[])
@@ -86,19 +88,17 @@ class GetGrades:
 
     #DEBUG
     def getGradesDebug(self):
-        yield ["keke"],['100'],["90"]
-        yield ["keke",'jopa'],['100','90'],["90",'80']
-        yield ["keke",'xuy','jopa'],['100','30','90'],["90",'20','80']
-        yield ["keke",'xuy','jopa','telefon'],['100','30','90','2.3'],["90",'20','80','44']
-        yield ["keke",'xuy','jopa','robot','telefon'],['100','30','90','55','2.3'],["90",'20','80','99','44']
+        yield ["course 1"],['100'],["90"]
+        yield ["course 1",'course 3'],['100','90'],["90",'80']
+        yield ["course 1",'course 2','course 3'],['100','30','90'],["90",'20','80']
+        yield ["course 1",'course 2','course 3','course 5'],['100','30','90','2.3'],["90",'20','80','44']
+        yield ["course 1",'course 2','course 3','course 4','course 5'],['100','30','90','55','2.3'],["90",'20','80','99','44']
         while True:
-            yield ["keke",'xuy','jopa','robot','telefon'],['100','30','90','55','2.3'],["90",'20','80','99','44']
+            yield ["course 1",'course 2','course 3','course 4','course 5'],['100','30','90','55','2.3'],["90",'20','80','99','44']
 
     def monFunc(self):
         #messagebox.showinfo("kek", "lol")
-        #try catch block or validation block
         kek = self.getGradesDebug()
-        self.minutesVal = float(self.minutes.get())
         self.saveCourseNum = self.chosenCourse.get()
         self.firstTime = 1
         while True:
@@ -178,13 +178,11 @@ class LoginWin:
 
     def tryToLogin(self, event = ""):
         self.newGui = Tk()
-        newkek = GetGrades(self.newGui,self.login.get(),self.passw.get(),self.getDateFormat(self.yearVal.get(),self.chosenSem.get()))
+        monGUI = GetGrades(self.newGui,self.login.get(),self.passw.get(),self.getDateFormat(self.yearVal.get(),self.chosenSem.get()))
         self.master.destroy()
-        self.newGui.bind("<Return>",newkek.updateFunc)
-        self.newGui.protocol("WM_DELETE_WINDOW", lambda: other.killThread(1))
+        self.newGui.bind("<Return>",monGUI.updateFunc)
+        self.newGui.protocol("WM_DELETE_WINDOW", lambda: monGUI.killThread(1))
         self.newGui.mainloop()
-
-
 
 #REMOVE WHEN FINISHED 
 try:
