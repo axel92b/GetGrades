@@ -180,18 +180,23 @@ class LoginWin:
         self.newGui.protocol("WM_DELETE_WINDOW", lambda: monGUI.killThread(1))
         self.newGui.mainloop()
 
-#REMOVE WHEN FINISHED 
-try:
-    logs = open("logs", "r").read().split('\n')
-except FileNotFoundError:
-    top = Tk()
-    m_gui = LoginWin(top)
-    top.bind("<Return>",m_gui.tryToLogin)
-    top.mainloop()
-    exit()
+def main():
+    #REMOVE WHEN FINISHED 
+    try:
+        logs = open("logs", "r").read().split('\n')
+    except FileNotFoundError:
+        top = Tk()
+        m_gui = LoginWin(top)
+        top.bind("<Return>",m_gui.tryToLogin)
+        top.mainloop()
+        return
 
-top = Tk()
-other = GetGrades(top,logs[0],logs[1],LoginWin.getDateFormat(None,'2018','Winter'))
-top.bind("<Return>",other.updateFunc)
-top.protocol("WM_DELETE_WINDOW", lambda: other.killThread(1))
-top.mainloop()
+    top = Tk()
+    other = GetGrades(top,logs[0],logs[1],LoginWin.getDateFormat(None,'2018','Winter'))
+    top.bind("<Return>",other.updateFunc)
+    top.protocol("WM_DELETE_WINDOW", lambda: other.killThread(1))
+    top.mainloop()
+
+
+if __name__== "__main__":
+    main()
