@@ -34,13 +34,13 @@ def getInfo(p):
     return arrNames,arrGrades, arrAvg
 
 # Use 'with' to ensure the session context is closed after use.
-def getData(log, passw):
+def getData(log, passw, sem):
     endOfTable = "Average of all students in this exercise."
     payload = {
         'Login': '1',
         'Course': '234218',
         'Page': 'grades.html',
-        'SEM': '201801',
+        'SEM': sem,
         'FromLock': '1',
         'ID': log,
         'Password': passw,

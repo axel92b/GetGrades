@@ -72,31 +72,25 @@ class Calculator:
 
 
 class GetGrades:
-    def __init__(self, master , login, passw):
-        self.tempDate = datetime.datetime.now()
+    def __init__(self, master , login, passw, sem):
+        
         self.master = master
+        self.sem = sem
         self.login = login
         self.passw = passw
         self.count = 0
         self.textCouter = ""
-        self.yearVal = StringVar(self.master)
-        self.yearVal.set(self.tempDate.year)
         self.textLabelVal = StringVar(self.master)
-        self.year = Spinbox(self.master,from_ = self.tempDate.year-2, to = 2055 ,textvariable = self.yearVal, width = 4)
         self.courseLabel = Label(self.master, text= "Course")
         self.textLabel = Label(self.master, textvariable = self.textLabelVal)
-        master.title("Get Grades Alpha")
-        self.a,self.b,self.c = GetGradesClass.getData(login, passw)
+        master.title("Get Grades Alpha - Hi " + self.login)
+        self.a,self.b,self.c = GetGradesClass.getData(self.login, self.passw, self.sem)
         self.chosenCourse = StringVar(self.master)
         #change to parser of course numbers
         courseNum = ['234218','234262']
         self.chosenCourse.set(courseNum[0])
         self.courseMenu = OptionMenu(self.master, self.chosenCourse, *courseNum)
         self.courseMenu.config(width = 13)
-        semNum = ['Winter','Spring', "Summer"]
-        self.chosenSem = StringVar(self.master)
-        self.chosenSem.set(semNum[0])
-        self.semMenu = OptionMenu(self.master, self.chosenSem, *semNum)
         self.minutes = Entry(self.master, width = 19,justify = RIGHT)
         self.lArr1 = []
         self.lArr2 = []
@@ -112,20 +106,13 @@ class GetGrades:
         self.courseLabel.grid(column = 0, row = 0)
         self.updButt.grid(column = 1, row = 3, columnspan = 2)
         self.courseMenu.grid(column = 1, row = 0, columnspan = 2)
-        self.year.grid(column = 2, row = 1)
-        self.semMenu.grid(column = 1, row = 1)
         self.minutes.grid(column = 1, row = 2, columnspan = 2)
         self.textLabel.grid(column = 3, row = 3, columnspan = 4)
         self.fillGridOfLabels(self.a,self.lArr1,0)
         self.fillGridOfLabels(self.b,self.lArr2,1)
         self.fillGridOfLabels(self.c,self.lArr3,2)
 
-    #TODO change to names of semesters
-    def getDateFormat(p1,p2):
-        if p2 == '2' or p2 == '3':
-            return str(int(p1)-1)+'0'+p2
-        else:
-            return p1+'01'
+    
 
     def getUpdatedIndexes(self,arr1,arr2):
         temp = []
@@ -175,7 +162,7 @@ class GetGrades:
             self.lArr6 = []
             time.sleep(60*self.minutesVal)
             #DEBUG
-            #self.d,self.e,self.f = GetGradesClass.getData(self.login,self.passw)
+            #self.d,self.e,self.f = GetGradesClass.getData(self.login,self.passw, self.sem)
             self.d,self.e,self.f = next(kek)
             if self.d != self.a or self.e != self.b or self.f != self.c:
                 self.count = 0
@@ -211,26 +198,43 @@ class GetGrades:
 class LoginWin:
     def __init__(self, master):
         self.master = master
+        self.tempDate = datetime.datetime.now()
         master.title("Get Grades Alpha")
         self.l1 = Label(master, text="Login")
         self.l2 = Label(master, text="Password")
         self.login = Entry(master, bd = 5)
         self.passw = Entry(master, bd = 5, show = "*")
-        self.butt = Button(master, text="Login", command = self.tryToLoginAux)
+        self.butt = Button(master, text="Login", command = lambda: self.tryToLogin(""))
+        self.yearVal = StringVar(self.master)
+        self.yearVal.set(self.tempDate.year)
+        self.year = Spinbox(self.master,from_ = self.tempDate.year-2, to = 2055 ,textvariable = self.yearVal, width = 4)
+        semNum = ['Winter','Spring', "Summer"]
+        self.chosenSem = StringVar(self.master)
+        self.chosenSem.set(semNum[0])
+        self.semMenu = OptionMenu(self.master, self.chosenSem, *semNum)
 
         # LAYOUT
         self.l1.grid(column=0, row = 0, sticky=W)
-        self.login.grid(column = 1, row = 0, sticky = W)
+        self.login.grid(column = 1, row = 0, sticky = W, columnspan = 2)
         self.l2.grid(column = 0, row = 1, sticky=W)
-        self.passw.grid(column = 1, row = 1, sticky = W)
-        self.butt.grid(column = 1, row = 2)
+        self.passw.grid(column = 1, row = 1, sticky = W, columnspan = 2)
+        self.year.grid(column = 2, row = 2, sticky = W)
+        self.semMenu.grid(column = 1, row = 2, sticky = W)
+        self.butt.grid(column = 1, row = 3)
+        self.semMenu.config(width = 7)
 
-    def tryToLoginAux(self):
-        self.tryToLogin("")
+    def getDateFormat(self,p1,p2):
+        if p2 == "Spring":
+            return str(int(p1)-1)+'02'
+        elif p2 == "Summer":
+            return str(int(p1)-1)+'03'
+        else:
+            return p1+'01'
 
     def tryToLogin(self, event):
         self.newGui = Tk()
-        newkek = GetGrades(self.newGui,self.login.get(),self.passw.get())
+        #TODO replace with parser
+        newkek = GetGrades(self.newGui,self.login.get(),self.passw.get(),self.getDateFormat(self.yearVal.get(),self.chosenSem.get()))
         self.master.destroy()
         self.newGui.mainloop()
 
@@ -238,7 +242,7 @@ class LoginWin:
 
 #REMOVE WHEN FINISHED 
 try:
-    logs = open("logs", "r").read().split('\n')
+    logs = open("logs6", "r").read().split('\n')
 except FileNotFoundError:
     top = Tk()
     m_gui = LoginWin(top)
@@ -247,5 +251,5 @@ except FileNotFoundError:
     exit()
 
 top = Tk()
-other = GetGrades(top,logs[0],logs[1])
+other = GetGrades(top,logs[0],logs[1],LoginWin.getDateFormat(None,'2018','Winter'))
 top.mainloop()
