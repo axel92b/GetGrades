@@ -6,8 +6,6 @@ import threading
 import winsound
 import datetime
 
-#TODO clean code
-
 class GetGrades:
     def __init__(self, master , login, passw, sem):
         self.master = master
@@ -23,7 +21,6 @@ class GetGrades:
         self.b = []
         self.c = []
         self.chosenCourse = StringVar(self.master)
-        #change to parser of course numbers
         courseNum = GetGradesClass.getCourses(self.login,self.passw, self.sem)
         self.chosenCourse.set(courseNum[0])
         self.courseMenu = OptionMenu(self.master, self.chosenCourse, *courseNum)
@@ -97,8 +94,7 @@ class GetGrades:
             yield ["course 1",'course 2','course 3','course 4','course 5'],['100','30','90','55','2.3'],["90",'20','80','99','44']
 
     def monFunc(self):
-        #messagebox.showinfo("kek", "lol")
-        kek = self.getGradesDebug()
+        # debugGen = self.getGradesDebug()
         self.saveCourseNum = self.chosenCourse.get()
         self.firstTime = 1
         while True:
@@ -107,7 +103,7 @@ class GetGrades:
             self.lArr6 = []
             self.d,self.e,self.f = GetGradesClass.getData(self.login,self.passw, self.sem, self.saveCourseNum)
             #DEBUG
-            #self.d,self.e,self.f = next(kek)
+            #self.d,self.e,self.f = next(debugGen)
             if self.d != self.a or self.firstTime == 1:
                 self.count = 0
                 tempCompArr = self.getUpdatedIndexes(self.a, self.d)
