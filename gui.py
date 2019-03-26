@@ -128,13 +128,17 @@ class GetGrades:
                     winsound.PlaySound('SystemQuestion',winsound.SND_ALIAS)
                 self.firstTime = 0
             self.count += 1 
-            if self.threadMessage == 0:
-                break
             if self.count == 1:
                 self.master.title("Get Grades(Alpha) - Hi " + self.login + " - Checked 1 time")
             else:
                 self.master.title("Get Grades(Alpha) - Hi " + self.login + " - Checked " + str(self.count) + " times")
-            time.sleep(60*self.minutesVal)
+            tempTime = 0
+            while (tempTime < 60*self.minutesVal):
+                if self.threadMessage == 0:
+                    return
+                time.sleep(5)
+                tempTime += 5
+
             
 class LoginWin:
     def __init__(self, master):
@@ -197,7 +201,7 @@ def main():
         return
 
     top = Tk()
-    other = GetGrades(top,logs[0],logs[1],LoginWin.getDateFormat(None,'2017','Winter'),GetGradesClass.getCourses(logs[0],logs[1], '201701'))
+    other = GetGrades(top,logs[0],logs[1],LoginWin.getDateFormat(None,'2018','Winter'),GetGradesClass.getCourses(logs[0],logs[1], '201801'))
     top.bind("<Return>",other.updateFunc)
     top.protocol("WM_DELETE_WINDOW", lambda: other.killThread(1))
     top.mainloop()
