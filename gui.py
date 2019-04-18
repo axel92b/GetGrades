@@ -85,13 +85,13 @@ class GetGrades:
 
     #DEBUG
     def getGradesDebug(self):
-        yield ["course 1"],['100'],["90"]
-        yield ["course 1",'course 3'],['100','90'],["90",'80']
-        yield ["course 1",'course 2','course 3'],['100','30','90'],["90",'20','80']
-        yield ["course 1",'course 2','course 3','course 5'],['100','30','90','2.3'],["90",'20','80','44']
-        yield ["course 1",'course 2','course 3','course 4','course 5'],['100','30','90','55','2.3'],["90",'20','80','99','44']
+        yield ["HW 1"],['100'],["90"]
+        yield ["HW 1",'HW 3'],['100','90'],["90",'80']
+        yield ["HW 1",'HW 2','HW 3'],['100','30','90'],["90",'20','80']
+        yield ["HW 1",'HW 2','HW 3','HW 5'],['100','30','90','2.3'],["90",'20','80','44']
+        yield ["HW 1",'HW 2','HW 3','HW 4','HW 5'],['100','30','90','55','2.3'],["90",'20','80','99','44']
         while True:
-            yield ["course 1",'course 2','course 3','course 4','course 5'],['100','30','90','55','2.3'],["90",'20','80','99','44']
+            yield ["HW 1",'HW 2','HW 3','HW 4','HW 5'],['100','30','90','55','2.3'],["90",'20','80','99','44']
 
     def monFunc(self):
         # debugGen = self.getGradesDebug()
