@@ -1,5 +1,6 @@
 # GetGrades
 Retrive and monitor grades from gr++ site(Technion)
+
 Just login and chose semester, course and duration for checks in minutes(minimum 1 minute) and wait for soud alert.
 
 ###### Login screen
