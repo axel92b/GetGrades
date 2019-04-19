@@ -2,7 +2,18 @@ import requests
 import winsound
 import time
 
-def getSubStr(p1, p2, src):
+def getSubStr(src, p1, p2):
+    """ Returns string that between first appearance of p1 and first appearance of p2 
+        and new string starting after first appearance p2.
+        
+        Parameters: 
+            src(str): Source string
+            p1(str):  Starting string.
+            p2(str):  Ending string.
+        Returns:
+            res(str): Cut string.
+            rem(str): Remainder string.
+    """
     if len(src) == 0:
         return "",""
     firstIndex = src.find(p1)
@@ -12,30 +23,41 @@ def getSubStr(p1, p2, src):
     secondIndex = newStr.find(p2)
     return newStr[len(p1):secondIndex], newStr[secondIndex+len(p2):]
 
-def fillList(src, p1, p2):
+def fillList(src, p1, p2, numeric = False):
+    """ Returns list that contains strings that exactly between p1 and p2 in src string.
+        
+        Parameters: 
+            src(str): Source string
+            p1(str):  Starting string.
+            p2(str):  Ending string.
+            numeric(bool): if true appends only numeric values
+        Returns:
+            list(str list): List with all strings that between p1 and p2 in src string.
+    """
     tempList = []
-    for i in range(len(src)):
-        subStr, src = getSubStr(p1,p2,src)
-        if src == "":
-            continue
-        tempList.append(subStr)
-    return tempList
-
-def fillCourseList(src, p1, p2):
-    tempList = []
-    for i in range(len(src)):
-        subStr, src = getSubStr(p1,p2,src)
-        if src == "":
-            continue
-        if subStr.isnumeric():
+    while True:
+        subStr, src = getSubStr(src,p1,p2)
+        if subStr != "" and ((numeric == False) or (numeric == True and subStr.isnumeric())):
             tempList.append(subStr)
+        if src == "":
+            break
     return tempList
 
-def getInfo(p):
-    arrNames = fillList(p,"<em>","</em>")
-    newStr = (getSubStr("Your grade", "Average", p))[0]
+def getInfo(src):
+    """ Cut source string and extracts all data then returns 3 arrays of strings, 
+        first contains names, second grades, third avarages.
+        
+        Parameters: 
+            src(str): Source string
+        Returns:
+            arrNames(str list):     Array of names.
+            arrGrades(str list):    Array of grades.
+            arrAvg(str list):       Array of averages.
+    """
+    arrNames = fillList(src,"<em>","</em>")
+    newStr = (getSubStr(src, "Your grade", "Average"))[0]
     arrGrades = fillList(newStr,"<td class=\"grade\">","</td>")
-    newStr = (getSubStr("Average", "" , p))[0]
+    newStr = (getSubStr(src, "Average", "" ))[0]
     arrAvg = fillList(newStr,"<td class=\"grade\">","</td>")
     return arrNames,arrGrades, arrAvg
 
@@ -110,5 +132,5 @@ def getCourses(log, passw, sem):
     firstIndex = tempStr.find(beginingOfTable)
     secondIndex = tempStr.find(endOfTable)
     p = tempStr[firstIndex:secondIndex]
-    arrNames = fillCourseList(tempStr,"<span class=\"black-text\">","</span>")
+    arrNames = fillList(tempStr,"<span class=\"black-text\">","</span>",numeric=True)
     return arrNames
