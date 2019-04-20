@@ -62,8 +62,22 @@ def getInfo(src):
     return arrNames,arrGrades, arrAvg
 
 def getData(log, passw, sem,course):
+    """ Main function, login and parse names of courses, grades, averages.
+        Returns 3 arrays with names,grades and averages.
+        
+        Parameters: 
+            log(str): Login string
+            passw(str): Password string
+            sem(str): Semester number string
+            course(str): Course number string
+        Returns:
+            arrNames(str list):     Array of names.
+            arrGrades(str list):    Array of grades.
+            arrAvg(str list):       Array of averages.
+    """
     beginingOfTable = "table bgcolor=\"#112244\""
     endOfTable = "Average of all students in this exercise."
+    # package for post request
     payload = {
         'Login': '1',
         'Course': course,
@@ -74,22 +88,23 @@ def getData(log, passw, sem,course):
         'Password': passw,
         'submit': 'proceed'
     }
-    p = ""
     arrNames = []
     arrGrades = []
     arrAvg = []
     curLen = 0
+    # send and receive html with data
     with requests.Session() as s:
-        p = s.post('https://grades.cs.technion.ac.il/grades.cgi', data=payload)
-    if "Your grade" not in p.text:
+        data = s.post('https://grades.cs.technion.ac.il/grades.cgi', data=payload)
+    if "Your grade" not in data.text:
         return [],[],[]
-    tempStr = str(p.text)
+    tempStr = str(data.text)
+    # extract data from html
     while True:
         firstIndex = tempStr.find(beginingOfTable)
         secondIndex = tempStr.find(endOfTable)
-        p = tempStr[firstIndex+len(beginingOfTable):secondIndex]
+        data = tempStr[firstIndex+len(beginingOfTable):secondIndex]
         tempStr = tempStr[secondIndex+len(endOfTable):]
-        temp = getInfo(p)
+        temp = getInfo(data)
         if arrNames == temp[0]:
             break
         arrNames = arrNames + temp[0]
@@ -101,8 +116,19 @@ def getData(log, passw, sem,course):
     return arrNames, arrGrades, arrAvg
 
 def getCourses(log, passw, sem):
+    """ Extracts list of courses in specified semester. Returns list of course numbers.
+        
+        Parameters: 
+            log(str): Login string
+            passw(str): Password string
+            sem(str): Semester number string
+        Returns:
+            arrNames(str list):     Array of names.
+    """
     beginingOfTable = "semester."
     endOfTable = "Add the following"
+    # some site specific code(not so easy to get to list of courses)
+    # package for post request
     payload = {
         'Login': '1',
         'SEM': sem,
@@ -111,6 +137,7 @@ def getCourses(log, passw, sem):
         'Password': passw,
         'submit': 'proceed'
     }
+    # dummy package for post request
     payload2 = {
         'Login': '1',
         'Course': '111111',
@@ -120,17 +147,18 @@ def getCourses(log, passw, sem):
         'Password': passw,
         'submit': 'proceed'
     }
-    p = ""
-    arrNames = []
     with requests.Session() as s:
-        p = s.post('https://grades.cs.technion.ac.il/grades.cgi', data=payload2)
-        p = s.post('https://grades.cs.technion.ac.il/grades.cgi', data=payload)
-        tempStr = str(p.text)
+        # first we'll send dummy request
+        data = s.post('https://grades.cs.technion.ac.il/grades.cgi', data=payload2)
+        # then we send normal package and get list of courses
+        data = s.post('https://grades.cs.technion.ac.il/grades.cgi', data=payload)
+        tempStr = str(data.text)
         if "<span class=\"highlighttab\">Course List</span></td>" not in tempStr:
-            p = s.post('https://grades.cs.technion.ac.il/grades.cgi', data=payload)
-        tempStr = str(p.text)
+            data = s.post('https://grades.cs.technion.ac.il/grades.cgi', data=payload)
+        tempStr = str(data.text)
+    # extract list from html
     firstIndex = tempStr.find(beginingOfTable)
     secondIndex = tempStr.find(endOfTable)
-    p = tempStr[firstIndex:secondIndex]
+    data = tempStr[firstIndex:secondIndex]
     arrNames = fillList(tempStr,"<span class=\"black-text\">","</span>",numeric=True)
     return arrNames
