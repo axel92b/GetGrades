@@ -26,10 +26,9 @@ class GetGrades:
         self.passw = passw
         self.courseNums = courseNums
         self.courseNames = courseNames
-        self.statusBarText = StringVar()
-        self.statusBarCountText = StringVar()
+        self.statusBarText = StringVar(self.master)
+        self.statusBarCountText = StringVar(self.master)
         self.statusBarText.set("Ready")
-        self.statusBarCountText.set("")
         self.mainFrame = Frame(self.master)
         self.courseLabel = Label(self.mainFrame, text= "Course")
         self.durationLabel = Label(self.mainFrame, text= "Duration")
@@ -222,15 +221,15 @@ class LoginWin:
             messagebox.showerror("Error", "Invalid login/password or you don't have any courses in semester: "+str(self.chosenSem.get())+" "+str(self.yearVal.get()))
             return
         monGUI = GetGrades(self.newGui,self.login.get(),self.passw.get(),self.sem, courseNums, courseNames)
-        self.master.destroy()
         self.newGui.bind("<Return>",monGUI.updateFunc)
         self.newGui.protocol("WM_DELETE_WINDOW", lambda: monGUI.killThread(1))
+        self.master.destroy()
         self.newGui.mainloop()
 
 def main():
     #REMOVE WHEN FINISHED 
     try:
-        logs = open("logs", "r").read().split('\n')
+        logs = open("logs3", "r").read().split('\n')
     except FileNotFoundError:
         top = Tk()
         m_gui = LoginWin(top)
