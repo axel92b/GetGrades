@@ -7,31 +7,49 @@ import winsound
 import datetime
 
 class GetGrades:
-    def __init__(self, master , login, passw, sem, courseNums):
+    def __init__(self, master , login, passw, sem, courseNums, courseNames):
+        """ Draw second window with grades and monitors site for changes.
+        
+        Parameters: 
+            master: Tkinter parent window.
+            login(str): Login string.
+            passw(str): Password string.
+            sem(str): Semester string.
+            courseNums(str list): List of courses in provided semester.
+            courseNames(str list): List of course names.
+        Returns:
+            Nothing.
+        """
         self.master = master
         self.sem = sem
         self.login = login
         self.passw = passw
         self.courseNums = courseNums
-        self.count = 0
-        self.threadMessage = 1
-        self.courseLabel = Label(self.master, text= "Course")
-        self.durationLabel = Label(self.master, text= "Duration")
-        master.title("Get Grades(Alpha) - Hi " + self.login)
+        self.courseNames = courseNames
+        self.statusBarText = StringVar()
+        self.statusBarCountText = StringVar()
+        self.statusBarText.set("Ready")
+        self.statusBarCountText.set("")
+        self.mainFrame = Frame(self.master)
+        self.courseLabel = Label(self.mainFrame, text= "Course")
+        self.durationLabel = Label(self.mainFrame, text= "Duration")
+        master.title("Get Grades(Alpha) - Hi " + self.login + ".")
         self.a = []
         self.b = []
         self.c = []
-        self.chosenCourse = StringVar(self.master)
+        self.chosenCourse = StringVar(self.mainFrame)
         self.chosenCourse.set(courseNums[0])
-        self.courseMenu = OptionMenu(self.master, self.chosenCourse, *courseNums)
+        self.courseMenu = OptionMenu(self.mainFrame, self.chosenCourse, *courseNums)
         self.courseMenu.config(width = 13)
-        self.minutes = Entry(self.master, width = 19,justify = RIGHT)
-        self.lArr1 = []
-        self.lArr2 = []
-        self.lArr3 = []
+        self.minutes = Entry(self.mainFrame, width = 19,justify = RIGHT)
+        self.layoutArr1 = []
+        self.layoutArr2 = []
+        self.layoutArr3 = []
+        self.statusBar = Label(self.master, textvariable = self.statusBarText, bd=1, relief=SUNKEN, anchor=W)
+        self.statusBarCount = Label(self.master, textvariable = self.statusBarCountText, bd=1, relief=SUNKEN, anchor=W)
 
         # BUTTONS
-        self.updButt = Button(self.master, text = "Monitor!", command = self.updateFunc)
+        self.updButt = Button(self.mainFrame, text = "Monitor!", command = self.updateFunc)
 
         # LAYOUT
         self.courseLabel.grid(column = 0, row = 0,sticky = W)
@@ -39,20 +57,40 @@ class GetGrades:
         self.courseMenu.grid(column = 1, row = 0)
         self.minutes.grid(column = 1, row = 1)
         self.updButt.grid(column = 1, row = 2)
+        self.mainFrame.pack(side=TOP,fill=X)
+        self.statusBar.pack(side=LEFT)
+        self.statusBarCount.pack(side=LEFT, fill=X, expand=1)
 
-    def getUpdatedIndexes(self,arr1,arr2):
-        temp = []
-        for i in range(len(arr2)):
-            if arr2[i] not in arr1:
-                temp.append(i)
-        return temp
+    def getUpdatedIndexes(self,orig,newArr):
+        """ Compare 2 arrays to find indexes for new items in newArr.
+        
+        Parameters: 
+            orig(str list): List of original(old) items.
+            newArr(str list): List of new items.
+        Returns:
+            indexes(int list): list of idexes of new items.
+        """
+        indexes = []
+        for i in range(len(newArr)):
+            if newArr[i] not in orig:
+                indexes.append(i)
+        return indexes
 
-    def fillLabels(self, arr, targArr, compArr = None):
+    def fillLabels(self, arr, targArr, newIndexes = None):
+        """ Fills arrays with new labels, if there new label will print it green.
+        
+        Parameters: 
+            arr(str list): List of strings.
+            targArr(Label list): List of labels(usually empty).
+            newIndexes(int list): List of new indexes that we need to print green.
+        Returns:
+            targArr(Label list): Fills list and doesn't return anything.
+        """
         for i in range(len(arr)):
-            if compArr != None and i in compArr and self.firstTime == 0:
-                targArr.append(Label(self.master, text=arr[i], fg="green"))
+            if newIndexes != None and i in newIndexes and not self.firstTime:
+                targArr.append(Label(self.mainFrame, text=arr[i], fg="green"))
                 continue
-            targArr.append(Label(self.master, text=arr[i]))
+            targArr.append(Label(self.mainFrame, text=arr[i]))
 
     def fillGridOfLabels(self,arr,targArr,r):
         for i in range(2,len(arr)+2):
@@ -65,16 +103,15 @@ class GetGrades:
             messagebox.showerror("Error", "Please enter valid duration")
             return
         self.killThread()
-        self.threadMessage = 1
-        self.t1 = threading.Thread(target=self.monFunc, args=[])
-        self.t1.start()
+        self.threadCanRun = 1
+        self.t1 = threading.Thread(target=self.monFunc, args=[]).start()
 
     def killThread(self, destroy=0):
         if destroy == 1:
             self.master.destroy()
         try:
             if self.t1.isAlive():
-                self.threadMessage = 0
+                self.threadCanRun = 0
                 self.t1.join()
         except:
             self.t1 = ""
@@ -97,47 +134,48 @@ class GetGrades:
         # debugGen = self.getGradesDebug()
         self.saveCourseNum = self.chosenCourse.get()
         self.firstTime = 1
+        self.statusBarText.set(self.courseNames[self.courseNums.index(self.saveCourseNum)])
+        self.count = 0
         while True:
-            self.lArr4 = []
-            self.lArr5 = []
-            self.lArr6 = []
+            self.layoutArr4 = []
+            self.layoutArr5 = []
+            self.layoutArr6 = []
             self.d,self.e,self.f = GetGradesClass.getData(self.login,self.passw, self.sem, self.saveCourseNum)
             #DEBUG
-            #self.d,self.e,self.f = next(debugGen)
+            # self.d,self.e,self.f = next(debugGen)
             if self.d != self.a or self.firstTime == 1:
-                self.count = 0
                 tempCompArr = self.getUpdatedIndexes(self.a, self.d)
-                self.fillLabels(self.d,self.lArr4,tempCompArr)
-                self.fillLabels(self.e,self.lArr5,tempCompArr)
-                self.fillLabels(self.f,self.lArr6,tempCompArr)
-                self.destroyLabel(self.lArr1)
-                self.destroyLabel(self.lArr2)
-                self.destroyLabel(self.lArr3)
-                self.fillGridOfLabels(self.d,self.lArr4,0)
-                self.fillGridOfLabels(self.e,self.lArr5,1)
-                self.fillGridOfLabels(self.f,self.lArr6,2)
+                self.fillLabels(self.d,self.layoutArr4,tempCompArr)
+                self.fillLabels(self.e,self.layoutArr5,tempCompArr)
+                self.fillLabels(self.f,self.layoutArr6,tempCompArr)
+                self.destroyLabel(self.layoutArr1)
+                self.destroyLabel(self.layoutArr2)
+                self.destroyLabel(self.layoutArr3)
+                self.fillGridOfLabels(self.d,self.layoutArr4,0)
+                self.fillGridOfLabels(self.e,self.layoutArr5,1)
+                self.fillGridOfLabels(self.f,self.layoutArr6,2)
                 self.master.update()
                 self.a = self.d.copy()
                 self.b = self.e.copy()
                 self.c = self.f.copy()
-                self.lArr1 = self.lArr4.copy()
-                self.lArr2 = self.lArr5.copy()
-                self.lArr3 = self.lArr6.copy()
+                self.layoutArr1 = self.layoutArr4.copy()
+                self.layoutArr2 = self.layoutArr5.copy()
+                self.layoutArr3 = self.layoutArr6.copy()
                 if self.firstTime == 0:
                     winsound.PlaySound('SystemQuestion',winsound.SND_ALIAS)
                     winsound.PlaySound('SystemQuestion',winsound.SND_ALIAS)
                 self.firstTime = 0
             self.count += 1 
             if self.count == 1:
-                self.master.title("Get Grades(Alpha) - Hi " + self.login + " - Checked 1 time")
+                self.statusBarCountText.set("Checked 1 time")
             else:
-                self.master.title("Get Grades(Alpha) - Hi " + self.login + " - Checked " + str(self.count) + " times")
+                self.statusBarCountText.set("Checked " + str(self.count) + " times")
             tempTime = 0
             while (tempTime < 60*self.minutesVal):
-                if self.threadMessage == 0:
+                if self.threadCanRun == 0:
                     return
-                time.sleep(5)
-                tempTime += 5
+                time.sleep(1)
+                tempTime += 1
 
             
 class LoginWin:
@@ -179,11 +217,11 @@ class LoginWin:
     def tryToLogin(self, event = ""):
         self.newGui = Tk()
         self.sem = self.getDateFormat(self.yearVal.get(),self.chosenSem.get())
-        courseNums = GetGradesClass.getCourses(self.login.get(),self.passw.get(), self.sem)
+        courseNums,courseNames = GetGradesClass.getCourses(self.login.get(),self.passw.get(), self.sem)
         if len(courseNums) == 0:
             messagebox.showerror("Error", "Invalid login/password or you don't have any courses in semester: "+str(self.chosenSem.get())+" "+str(self.yearVal.get()))
             return
-        monGUI = GetGrades(self.newGui,self.login.get(),self.passw.get(),self.sem, courseNums)
+        monGUI = GetGrades(self.newGui,self.login.get(),self.passw.get(),self.sem, courseNums, courseNames)
         self.master.destroy()
         self.newGui.bind("<Return>",monGUI.updateFunc)
         self.newGui.protocol("WM_DELETE_WINDOW", lambda: monGUI.killThread(1))
@@ -201,7 +239,8 @@ def main():
         return
 
     top = Tk()
-    other = GetGrades(top,logs[0],logs[1],LoginWin.getDateFormat(None,'2018','Winter'),GetGradesClass.getCourses(logs[0],logs[1], '201801'))
+    temp1,temp2 = GetGradesClass.getCourses(logs[0],logs[1], '201801')
+    other = GetGrades(top,logs[0],logs[1],LoginWin.getDateFormat(None,'2018','Winter'),temp1,temp2)
     top.bind("<Return>",other.updateFunc)
     top.protocol("WM_DELETE_WINDOW", lambda: other.killThread(1))
     top.mainloop()
