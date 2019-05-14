@@ -83,7 +83,7 @@ class GetGrades:
             targArr(Label list): List of labels(usually empty).
             newIndexes(int list): List of new indexes that we need to print green.
         Returns:
-            targArr(Label list): Fills list and doesn't return anything.
+            Fills list and doesn't return anything.
         """
         for i in range(len(arr)):
             if newIndexes != None and i in newIndexes and not self.firstTime:
@@ -91,11 +91,26 @@ class GetGrades:
                 continue
             targArr.append(Label(self.mainFrame, text=arr[i]))
 
-    def fillGridOfLabels(self,arr,targArr,r):
-        for i in range(2,len(arr)+2):
+    def fillGridOfLabels(self,targArr,r):
+        """ Fills grid layout for grades on specified row.
+        
+        Parameters: 
+            targArr(Label list): List of labels.
+            r(int): Row for which we are filling.
+        Returns:
+            Fills list and doesn't return anything.
+        """
+        for i in range(2,len(targArr)+2):
             targArr[i-2].grid(column = i, row = r)
 
     def updateFunc(self, event = ""):
+        """ Creates new thread for monitoring.
+
+            Parameters: 
+                event: Empty but needed to bind this method to keyboard key.
+            Returns:
+                Nothing.
+        """
         try:
             self.minutesVal = float(self.minutes.get())
         except ValueError:
@@ -106,6 +121,14 @@ class GetGrades:
         self.t1 = threading.Thread(target=self.monFunc, args=[]).start()
 
     def killThread(self, destroy=0):
+        """ Kills thread(sends message to thread that he isn't permitted to run anymore).
+
+            Parameters: 
+                destroy(int): When set to 1 means that we are closing app and need simply 
+                              to destroy thread before exit.
+            Returns:
+                Nothing.
+        """
         if destroy == 1:
             self.master.destroy()
         try:
@@ -116,6 +139,13 @@ class GetGrades:
             self.t1 = ""
 
     def destroyLabel(self, arr):
+        """ Destroy old labels before creating new ones.
+
+            Parameters: 
+                arr(Labels list): List of labels that we want to destroy.
+            Returns:
+                Nothing.
+        """
         for i in range(len(arr)):
             arr[i].destroy()
 
@@ -130,6 +160,13 @@ class GetGrades:
             yield ["HW 1",'HW 2','HW 3','HW 4','HW 5'],['100','30','90','55','2.3'],["90",'20','80','99','44']
 
     def monFunc(self):
+        """ Monitor function, checks site for new grades and if there new grades, updates UI.
+
+            Parameters: 
+                Only "self".
+            Returns:
+                Nothing.
+        """
         # debugGen = self.getGradesDebug()
         self.saveCourseNum = self.chosenCourse.get()
         self.firstTime = 1
@@ -142,6 +179,7 @@ class GetGrades:
             self.d,self.e,self.f = GetGradesClass.getData(self.login,self.passw, self.sem, self.saveCourseNum)
             #DEBUG
             # self.d,self.e,self.f = next(debugGen)
+            # if found new grades, then update.
             if self.d != self.a or self.firstTime == 1:
                 tempCompArr = self.getUpdatedIndexes(self.a, self.d)
                 self.fillLabels(self.d,self.layoutArr4,tempCompArr)
@@ -150,9 +188,9 @@ class GetGrades:
                 self.destroyLabel(self.layoutArr1)
                 self.destroyLabel(self.layoutArr2)
                 self.destroyLabel(self.layoutArr3)
-                self.fillGridOfLabels(self.d,self.layoutArr4,0)
-                self.fillGridOfLabels(self.e,self.layoutArr5,1)
-                self.fillGridOfLabels(self.f,self.layoutArr6,2)
+                self.fillGridOfLabels(self.layoutArr4,0)
+                self.fillGridOfLabels(self.layoutArr5,1)
+                self.fillGridOfLabels(self.layoutArr6,2)
                 self.master.update()
                 self.a = self.d.copy()
                 self.b = self.e.copy()
@@ -179,6 +217,13 @@ class GetGrades:
             
 class LoginWin:
     def __init__(self, master):
+        """ Draw first login window.
+        
+        Parameters: 
+            master: Tkinter parent window.
+        Returns:
+            Nothing.
+        """
         self.master = master
         self.tempDate = datetime.datetime.now()
         master.title("Get Grades(Alpha)")
@@ -206,6 +251,14 @@ class LoginWin:
         self.semMenu.config(width = 7)
 
     def getDateFormat(self,p1,p2):
+        """ Convert userprovided date to gr++ format.
+        
+        Parameters: 
+            p1(str): Year.
+            p2(str): Month.
+        Returns:
+            String represents user desired semester in gr++ format.
+        """
         if p2 == "Spring":
             return str(int(p1)-1)+'02'
         elif p2 == "Summer":
@@ -214,6 +267,14 @@ class LoginWin:
             return p1+'01'
 
     def tryToLogin(self, event = ""):
+        """ Tries to login with userprovided login and password, incase of success 
+            creates second window.
+
+        Parameters: 
+            Only "self".
+        Returns:
+            Noting.
+        """
         self.newGui = Tk()
         self.sem = self.getDateFormat(self.yearVal.get(),self.chosenSem.get())
         courseNums,courseNames = GetGradesClass.getCourses(self.login.get(),self.passw.get(), self.sem)
