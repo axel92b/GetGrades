@@ -8,3 +8,5 @@ Just login and chose semester, course and duration for checks in minutes(minimum
 
 ###### Main window
 ![Screenshot 2](Screenshots/Untitled2.png)
+
+For now windows ONLY!
