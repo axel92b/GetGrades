@@ -33,9 +33,9 @@ class GetGrades:
         self.courseLabel = Label(self.mainFrame, text= "Course")
         self.durationLabel = Label(self.mainFrame, text= "Duration")
         master.title("Get Grades(Alpha) - Hi " + self.login + ".")
-        self.a = []
-        self.b = []
-        self.c = []
+        self.names = []
+        self.grades = []
+        self.avgs = []
         self.chosenCourse = StringVar(self.mainFrame)
         self.chosenCourse.set(courseNums[0])
         self.courseMenu = OptionMenu(self.mainFrame, self.chosenCourse, *courseNums)
@@ -176,15 +176,15 @@ class GetGrades:
             self.layoutArr4 = []
             self.layoutArr5 = []
             self.layoutArr6 = []
-            self.d,self.e,self.f = GetGradesClass.getData(self.login,self.passw, self.sem, self.saveCourseNum)
+            self.newNames,self.newGrades,self.newAvgs = GetGradesClass.getData(self.login,self.passw, self.sem, self.saveCourseNum)
             #DEBUG
-            # self.d,self.e,self.f = next(debugGen)
+            # self.newNames,self.newGrades,self.newAvgs = next(debugGen)
             # if found new grades, then update.
-            if self.d != self.a or self.firstTime == 1:
-                tempCompArr = self.getUpdatedIndexes(self.a, self.d)
-                self.fillLabels(self.d,self.layoutArr4,tempCompArr)
-                self.fillLabels(self.e,self.layoutArr5,tempCompArr)
-                self.fillLabels(self.f,self.layoutArr6,tempCompArr)
+            if self.newNames != self.names or self.firstTime == 1:
+                tempCompArr = self.getUpdatedIndexes(self.names, self.newNames)
+                self.fillLabels(self.newNames,self.layoutArr4,tempCompArr)
+                self.fillLabels(self.newGrades,self.layoutArr5,tempCompArr)
+                self.fillLabels(self.newAvgs,self.layoutArr6,tempCompArr)
                 self.destroyLabel(self.layoutArr1)
                 self.destroyLabel(self.layoutArr2)
                 self.destroyLabel(self.layoutArr3)
@@ -192,9 +192,9 @@ class GetGrades:
                 self.fillGridOfLabels(self.layoutArr5,1)
                 self.fillGridOfLabels(self.layoutArr6,2)
                 self.master.update()
-                self.a = self.d.copy()
-                self.b = self.e.copy()
-                self.c = self.f.copy()
+                self.names = self.newNames.copy()
+                self.grades = self.newGrades.copy()
+                self.avgs = self.newAvgs.copy()
                 self.layoutArr1 = self.layoutArr4.copy()
                 self.layoutArr2 = self.layoutArr5.copy()
                 self.layoutArr3 = self.layoutArr6.copy()
