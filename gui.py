@@ -149,16 +149,6 @@ class GetGrades:
         for i in range(len(arr)):
             arr[i].destroy()
 
-    #DEBUG
-    def getGradesDebug(self):
-        yield ["HW 1"],['100'],["90"]
-        yield ["HW 1",'HW 3'],['100','90'],["90",'80']
-        yield ["HW 1",'HW 2','HW 3'],['100','30','90'],["90",'20','80']
-        yield ["HW 1",'HW 2','HW 3','HW 5'],['100','30','90','2.3'],["90",'20','80','44']
-        yield ["HW 1",'HW 2','HW 3','HW 4','HW 5'],['100','30','90','55','2.3'],["90",'20','80','99','44']
-        while True:
-            yield ["HW 1",'HW 2','HW 3','HW 4','HW 5'],['100','30','90','55','2.3'],["90",'20','80','99','44']
-
     def monFunc(self):
         """ Monitor function, checks site for new grades and if there new grades, updates UI.
 
@@ -167,7 +157,6 @@ class GetGrades:
             Returns:
                 Nothing.
         """
-        # debugGen = self.getGradesDebug()
         self.saveCourseNum = self.chosenCourse.get()
         self.firstTime = 1
         self.statusBarText.set(self.courseNames[self.courseNums.index(self.saveCourseNum)])
@@ -177,8 +166,6 @@ class GetGrades:
             self.gradesLayoutArrNew = []
             self.avgsLayoutArrNew = []
             self.newNames,self.newGrades,self.newAvgs = GetGradesClass.getData(self.login,self.passw, self.sem, self.saveCourseNum)
-            #DEBUG
-            # self.newNames,self.newGrades,self.newAvgs = next(debugGen)
             # if found new grades, then update.
             if self.newNames != self.names or self.firstTime == 1:
                 tempCompArr = self.getUpdatedIndexes(self.names, self.newNames)
@@ -288,22 +275,11 @@ class LoginWin:
         self.newGui.mainloop()
 
 def main():
-    #REMOVE WHEN FINISHED 
-    try:
-        logs = open("logs3", "r").read().split('\n')
-    except FileNotFoundError:
-        top = Tk()
-        m_gui = LoginWin(top)
-        top.bind("<Return>",m_gui.tryToLogin)
-        top.mainloop()
-        return
-
     top = Tk()
-    temp1,temp2 = GetGradesClass.getCourses(logs[0],logs[1], '201801')
-    other = GetGrades(top,logs[0],logs[1],LoginWin.getDateFormat(None,'2018','Winter'),temp1,temp2)
-    top.bind("<Return>",other.updateFunc)
-    top.protocol("WM_DELETE_WINDOW", lambda: other.killThread(1))
+    m_gui = LoginWin(top)
+    top.bind("<Return>",m_gui.tryToLogin)
     top.mainloop()
+
 
 
 if __name__== "__main__":
