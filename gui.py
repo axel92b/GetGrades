@@ -41,9 +41,9 @@ class GetGrades:
         self.courseMenu = OptionMenu(self.mainFrame, self.chosenCourse, *courseNums)
         self.courseMenu.config(width = 13)
         self.minutes = Entry(self.mainFrame, width = 19,justify = RIGHT)
-        self.layoutArr1 = []
-        self.layoutArr2 = []
-        self.layoutArr3 = []
+        self.nameLayoutArr = []
+        self.gradesLayoutArr = []
+        self.avgsLayoutArr = []
         self.statusBar = Label(self.master, textvariable = self.statusBarText, bd=1, relief=SUNKEN, anchor=W)
         self.statusBarCount = Label(self.master, textvariable = self.statusBarCountText, bd=1, relief=SUNKEN, anchor=W)
 
@@ -162,29 +162,29 @@ class GetGrades:
         self.statusBarText.set(self.courseNames[self.courseNums.index(self.saveCourseNum)])
         self.count = 0
         while True:
-            self.layoutArr4 = []
-            self.layoutArr5 = []
-            self.layoutArr6 = []
+            self.nameLayoutArrNew= []
+            self.gradesLayoutArrNew = []
+            self.avgsLayoutArrNew = []
             self.newNames,self.newGrades,self.newAvgs = GetGradesClass.getData(self.login,self.passw, self.sem, self.saveCourseNum)
             # if found new grades, then update.
             if self.newNames != self.names or self.firstTime == 1:
                 tempCompArr = self.getUpdatedIndexes(self.names, self.newNames)
-                self.fillLabels(self.newNames,self.layoutArr4,tempCompArr)
-                self.fillLabels(self.newGrades,self.layoutArr5,tempCompArr)
-                self.fillLabels(self.newAvgs,self.layoutArr6,tempCompArr)
-                self.destroyLabel(self.layoutArr1)
-                self.destroyLabel(self.layoutArr2)
-                self.destroyLabel(self.layoutArr3)
-                self.fillGridOfLabels(self.layoutArr4,0)
-                self.fillGridOfLabels(self.layoutArr5,1)
-                self.fillGridOfLabels(self.layoutArr6,2)
+                self.fillLabels(self.newNames,self.nameLayoutArrNew,tempCompArr)
+                self.fillLabels(self.newGrades,self.gradesLayoutArrNew,tempCompArr)
+                self.fillLabels(self.newAvgs,self.avgsLayoutArrNew,tempCompArr)
+                self.destroyLabel(self.nameLayoutArr)
+                self.destroyLabel(self.gradesLayoutArr)
+                self.destroyLabel(self.avgsLayoutArr)
+                self.fillGridOfLabels(self.nameLayoutArrNew,0)
+                self.fillGridOfLabels(self.gradesLayoutArrNew,1)
+                self.fillGridOfLabels(self.avgsLayoutArrNew,2)
                 self.master.update()
                 self.names = self.newNames.copy()
                 self.grades = self.newGrades.copy()
                 self.avgs = self.newAvgs.copy()
-                self.layoutArr1 = self.layoutArr4.copy()
-                self.layoutArr2 = self.layoutArr5.copy()
-                self.layoutArr3 = self.layoutArr6.copy()
+                self.nameLayoutArr = self.nameLayoutArrNew.copy()
+                self.gradesLayoutArr = self.gradesLayoutArrNew.copy()
+                self.avgsLayoutArr = self.avgsLayoutArrNew.copy()
                 if self.firstTime == 0:
                     winsound.PlaySound('SystemQuestion',winsound.SND_ALIAS)
                     winsound.PlaySound('SystemQuestion',winsound.SND_ALIAS)
