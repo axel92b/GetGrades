@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import messagebox
-import GetGradesClass
+import GetGradesLogic
 import time
 import threading
 import winsound
@@ -165,7 +165,7 @@ class GetGrades:
             self.nameLayoutArrNew= []
             self.gradesLayoutArrNew = []
             self.avgsLayoutArrNew = []
-            self.newNames,self.newGrades,self.newAvgs = GetGradesClass.getData(self.login,self.passw, self.sem, self.saveCourseNum)
+            self.newNames,self.newGrades,self.newAvgs = GetGradesLogic.getData(self.login,self.passw, self.sem, self.saveCourseNum)
             # if found new grades, then update.
             if self.newNames != self.names or self.firstTime == 1:
                 tempCompArr = self.getUpdatedIndexes(self.names, self.newNames)
@@ -264,7 +264,7 @@ class LoginWin:
         """
         self.newGui = Tk()
         self.sem = self.getDateFormat(self.yearVal.get(),self.chosenSem.get())
-        courseNums,courseNames = GetGradesClass.getCourses(self.login.get(),self.passw.get(), self.sem)
+        courseNums,courseNames = GetGradesLogic.getCourses(self.login.get(),self.passw.get(), self.sem)
         if len(courseNums) == 0:
             messagebox.showerror("Error", "Invalid login/password or you don't have any courses in semester: "+str(self.chosenSem.get())+" "+str(self.yearVal.get()))
             return
