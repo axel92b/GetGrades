@@ -136,6 +136,9 @@ def getData(log, passw, sem,course):
         if curLen == len(arrNames):
             break
         curLen = len(arrNames)
+    arrNames = [""] +  arrNames
+    arrGrades = ["Your grade"] +  arrGrades
+    arrAvg = ["Average"] +  arrAvg
     return arrNames, arrGrades, arrAvg
 
 def getCourses(log, passw, sem):
