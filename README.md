@@ -9,4 +9,10 @@ Just login and chose semester, course and duration for checks in minutes(for exa
 ###### Main window
 ![Screenshot 2](Screenshots/Untitled2.png)
 
+### TODO
+
+- [x] Add names to rows
+- [ ] Get rid of winsound(in order to make app cross-platform)
+- [ ] Android version
+
 For now windows ONLY!
