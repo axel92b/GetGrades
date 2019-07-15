@@ -262,12 +262,12 @@ class LoginWin:
         Returns:
             Noting.
         """
-        self.newGui = Tk()
         self.sem = self.getDateFormat(self.yearVal.get(),self.chosenSem.get())
         courseNums,courseNames = GetGradesLogic.getCourses(self.login.get(),self.passw.get(), self.sem)
         if len(courseNums) == 0:
             messagebox.showerror("Error", "Invalid login/password or you don't have any courses in semester: "+str(self.chosenSem.get())+" "+str(self.yearVal.get()))
             return
+        self.newGui = Tk()
         monGUI = GetGrades(self.newGui,self.login.get(),self.passw.get(),self.sem, courseNums, courseNames)
         self.newGui.bind("<Return>",monGUI.updateFunc)
         self.newGui.protocol("WM_DELETE_WINDOW", lambda: monGUI.killThread(1))
