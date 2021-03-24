@@ -6,8 +6,9 @@ import threading
 import winsound
 import datetime
 
+
 class GetGrades:
-    def __init__(self, master , login, passw, sem, courseNums, courseNames):
+    def __init__(self, master, login, passw, sem, courseNums, courseNames):
         """ Draw second window with grades and monitors site for changes.
         
         Parameters: 
@@ -30,8 +31,8 @@ class GetGrades:
         self.statusBarCountText = StringVar(self.master)
         self.statusBarText.set("Ready")
         self.mainFrame = Frame(self.master)
-        self.courseLabel = Label(self.mainFrame, text= "Course")
-        self.durationLabel = Label(self.mainFrame, text= "Duration")
+        self.courseLabel = Label(self.mainFrame, text="Course")
+        self.durationLabel = Label(self.mainFrame, text="Duration")
         master.title("Get Grades(Alpha) - Hi " + self.login + ".")
         self.names = []
         self.grades = []
@@ -39,28 +40,28 @@ class GetGrades:
         self.chosenCourse = StringVar(self.mainFrame)
         self.chosenCourse.set(courseNums[0])
         self.courseMenu = OptionMenu(self.mainFrame, self.chosenCourse, *courseNums)
-        self.courseMenu.config(width = 13)
-        self.minutes = Entry(self.mainFrame, width = 19,justify = RIGHT)
+        self.courseMenu.config(width=13)
+        self.minutes = Entry(self.mainFrame, width=19, justify=RIGHT)
         self.nameLayoutArr = []
         self.gradesLayoutArr = []
         self.avgsLayoutArr = []
-        self.statusBar = Label(self.master, textvariable = self.statusBarText, bd=1, relief=SUNKEN, anchor=W)
-        self.statusBarCount = Label(self.master, textvariable = self.statusBarCountText, bd=1, relief=SUNKEN, anchor=W)
+        self.statusBar = Label(self.master, textvariable=self.statusBarText, bd=1, relief=SUNKEN, anchor=W)
+        self.statusBarCount = Label(self.master, textvariable=self.statusBarCountText, bd=1, relief=SUNKEN, anchor=W)
 
         # BUTTONS
-        self.updButt = Button(self.mainFrame, text = "Monitor!", command = self.updateFunc)
+        self.updButt = Button(self.mainFrame, text="Monitor!", command=self.updateFunc)
 
         # LAYOUT
-        self.courseLabel.grid(column = 0, row = 0,sticky = W)
-        self.durationLabel.grid(column = 0, row = 1,sticky = W)
-        self.courseMenu.grid(column = 1, row = 0)
-        self.minutes.grid(column = 1, row = 1)
-        self.updButt.grid(column = 1, row = 2)
-        self.mainFrame.pack(side=TOP,fill=X)
+        self.courseLabel.grid(column=0, row=0, sticky=W)
+        self.durationLabel.grid(column=0, row=1, sticky=W)
+        self.courseMenu.grid(column=1, row=0)
+        self.minutes.grid(column=1, row=1)
+        self.updButt.grid(column=1, row=2)
+        self.mainFrame.pack(side=TOP, fill=X)
         self.statusBar.pack(side=LEFT)
         self.statusBarCount.pack(side=LEFT, fill=X, expand=1)
 
-    def getUpdatedIndexes(self,orig,newArr):
+    def getUpdatedIndexes(self, orig, newArr):
         """ Compare 2 arrays to find indexes for new items in newArr.
         
         Parameters: 
@@ -75,7 +76,7 @@ class GetGrades:
                 indexes.append(i)
         return indexes
 
-    def fillLabels(self, arr, targArr, newIndexes = None):
+    def fillLabels(self, arr, targArr, newIndexes=None):
         """ Fills arrays with new labels, if there new label will print it green.
         
         Parameters: 
@@ -91,7 +92,7 @@ class GetGrades:
                 continue
             targArr.append(Label(self.mainFrame, text=arr[i]))
 
-    def fillGridOfLabels(self,targArr,r):
+    def fillGridOfLabels(self, targArr, r):
         """ Fills grid layout for grades on specified row.
         
         Parameters: 
@@ -100,10 +101,10 @@ class GetGrades:
         Returns:
             Fills list and doesn't return anything.
         """
-        for i in range(2,len(targArr)+2):
-            targArr[i-2].grid(column = i, row = r)
+        for i in range(2, len(targArr) + 2):
+            targArr[i - 2].grid(column=i, row=r)
 
-    def updateFunc(self, event = ""):
+    def updateFunc(self, event=""):
         """ Creates new thread for monitoring.
 
             Parameters: 
@@ -162,22 +163,23 @@ class GetGrades:
         self.statusBarText.set(self.courseNames[self.courseNums.index(self.saveCourseNum)])
         self.count = 0
         while True:
-            self.nameLayoutArrNew= []
+            self.nameLayoutArrNew = []
             self.gradesLayoutArrNew = []
             self.avgsLayoutArrNew = []
-            self.newNames,self.newGrades,self.newAvgs = GetGradesLogic.getData(self.login,self.passw, self.sem, self.saveCourseNum)
+            self.newNames, self.newGrades, self.newAvgs = GetGradesLogic.getData(self.login, self.passw, self.sem,
+                                                                                 self.saveCourseNum)
             # if found new grades, then update.
             if self.newNames != self.names or self.firstTime == 1:
                 tempCompArr = self.getUpdatedIndexes(self.names, self.newNames)
-                self.fillLabels(self.newNames,self.nameLayoutArrNew,tempCompArr)
-                self.fillLabels(self.newGrades,self.gradesLayoutArrNew,tempCompArr)
-                self.fillLabels(self.newAvgs,self.avgsLayoutArrNew,tempCompArr)
+                self.fillLabels(self.newNames, self.nameLayoutArrNew, tempCompArr)
+                self.fillLabels(self.newGrades, self.gradesLayoutArrNew, tempCompArr)
+                self.fillLabels(self.newAvgs, self.avgsLayoutArrNew, tempCompArr)
                 self.destroyLabel(self.nameLayoutArr)
                 self.destroyLabel(self.gradesLayoutArr)
                 self.destroyLabel(self.avgsLayoutArr)
-                self.fillGridOfLabels(self.nameLayoutArrNew,0)
-                self.fillGridOfLabels(self.gradesLayoutArrNew,1)
-                self.fillGridOfLabels(self.avgsLayoutArrNew,2)
+                self.fillGridOfLabels(self.nameLayoutArrNew, 0)
+                self.fillGridOfLabels(self.gradesLayoutArrNew, 1)
+                self.fillGridOfLabels(self.avgsLayoutArrNew, 2)
                 self.master.update()
                 self.names = self.newNames.copy()
                 self.grades = self.newGrades.copy()
@@ -186,22 +188,22 @@ class GetGrades:
                 self.gradesLayoutArr = self.gradesLayoutArrNew.copy()
                 self.avgsLayoutArr = self.avgsLayoutArrNew.copy()
                 if self.firstTime == 0:
-                    winsound.PlaySound('SystemQuestion',winsound.SND_ALIAS)
-                    winsound.PlaySound('SystemQuestion',winsound.SND_ALIAS)
+                    winsound.PlaySound('SystemQuestion', winsound.SND_ALIAS)
+                    winsound.PlaySound('SystemQuestion', winsound.SND_ALIAS)
                 self.firstTime = 0
-            self.count += 1 
+            self.count += 1
             if self.count == 1:
                 self.statusBarCountText.set("Checked 1 time")
             else:
                 self.statusBarCountText.set("Checked " + str(self.count) + " times")
             tempTime = 0
-            while (tempTime < 60*self.minutesVal):
+            while (tempTime < 60 * self.minutesVal):
                 if self.threadCanRun == 0:
                     return
                 time.sleep(1)
                 tempTime += 1
 
-            
+
 class LoginWin:
     def __init__(self, master):
         """ Draw first login window.
@@ -216,28 +218,28 @@ class LoginWin:
         master.title("Get Grades(Alpha)")
         self.l1 = Label(master, text="Login")
         self.l2 = Label(master, text="Password")
-        self.login = Entry(master, bd = 5)
-        self.passw = Entry(master, bd = 5, show = "*")
-        self.butt = Button(master, text="Login", command = self.tryToLogin)
+        self.login = Entry(master, bd=5)
+        self.passw = Entry(master, bd=5, show="*")
+        self.butt = Button(master, text="Login", command=self.tryToLogin)
         self.yearVal = StringVar(self.master)
         self.yearVal.set(self.tempDate.year)
-        self.year = Spinbox(self.master,from_ = self.tempDate.year-2, to = 2055 ,textvariable = self.yearVal, width = 4)
-        semNum = ['Winter','Spring', "Summer"]
+        self.year = Spinbox(self.master, from_=self.tempDate.year - 2, to=2055, textvariable=self.yearVal, width=4)
+        semNum = ['Winter', 'Spring', "Summer"]
         self.chosenSem = StringVar(self.master)
         self.chosenSem.set(semNum[0])
         self.semMenu = OptionMenu(self.master, self.chosenSem, *semNum)
 
         # LAYOUT
-        self.l1.grid(column=0, row = 0, sticky=W)
-        self.login.grid(column = 1, row = 0, sticky = W, columnspan = 2)
-        self.l2.grid(column = 0, row = 1, sticky=W)
-        self.passw.grid(column = 1, row = 1, sticky = W, columnspan = 2)
-        self.year.grid(column = 2, row = 2, sticky = W)
-        self.semMenu.grid(column = 1, row = 2, sticky = W)
-        self.butt.grid(column = 1, row = 3)
-        self.semMenu.config(width = 7)
+        self.l1.grid(column=0, row=0, sticky=W)
+        self.login.grid(column=1, row=0, sticky=W, columnspan=2)
+        self.l2.grid(column=0, row=1, sticky=W)
+        self.passw.grid(column=1, row=1, sticky=W, columnspan=2)
+        self.year.grid(column=2, row=2, sticky=W)
+        self.semMenu.grid(column=1, row=2, sticky=W)
+        self.butt.grid(column=1, row=3)
+        self.semMenu.config(width=7)
 
-    def getDateFormat(self,p1,p2):
+    def getDateFormat(self, p1, p2):
         """ Convert userprovided date to gr++ format.
         
         Parameters: 
@@ -247,13 +249,13 @@ class LoginWin:
             String represents user desired semester in gr++ format.
         """
         if p2 == "Spring":
-            return str(int(p1)-1)+'02'
+            return str(int(p1) - 1) + '02'
         elif p2 == "Summer":
-            return str(int(p1)-1)+'03'
+            return str(int(p1) - 1) + '03'
         else:
-            return p1+'01'
+            return p1 + '01'
 
-    def tryToLogin(self, event = ""):
+    def tryToLogin(self, event=""):
         """ Tries to login with userprovided login and password, incase of success 
             creates second window.
 
@@ -262,25 +264,26 @@ class LoginWin:
         Returns:
             Noting.
         """
-        self.sem = self.getDateFormat(self.yearVal.get(),self.chosenSem.get())
-        courseNums,courseNames = GetGradesLogic.getCourses(self.login.get(),self.passw.get(), self.sem)
+        self.sem = self.getDateFormat(self.yearVal.get(), self.chosenSem.get())
+        courseNums, courseNames = GetGradesLogic.getCourses(self.login.get(), self.passw.get(), self.sem)
         if len(courseNums) == 0:
-            messagebox.showerror("Error", "Invalid login/password or you don't have any courses in semester: "+str(self.chosenSem.get())+" "+str(self.yearVal.get()))
+            messagebox.showerror("Error", "Invalid login/password or you don't have any courses in semester: " + str(
+                self.chosenSem.get()) + " " + str(self.yearVal.get()))
             return
         self.newGui = Tk()
-        monGUI = GetGrades(self.newGui,self.login.get(),self.passw.get(),self.sem, courseNums, courseNames)
-        self.newGui.bind("<Return>",monGUI.updateFunc)
+        monGUI = GetGrades(self.newGui, self.login.get(), self.passw.get(), self.sem, courseNums, courseNames)
+        self.newGui.bind("<Return>", monGUI.updateFunc)
         self.newGui.protocol("WM_DELETE_WINDOW", lambda: monGUI.killThread(1))
         self.master.destroy()
         self.newGui.mainloop()
 
+
 def main():
     top = Tk()
     m_gui = LoginWin(top)
-    top.bind("<Return>",m_gui.tryToLogin)
+    top.bind("<Return>", m_gui.tryToLogin)
     top.mainloop()
 
 
-
-if __name__== "__main__":
+if __name__ == "__main__":
     main()
